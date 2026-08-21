@@ -39,15 +39,27 @@ if st.button("Generate Plan"):
         exit()
     try:
         response = groq_chat.invoke(
-        f"""Generating a plan for {name} with the following parameters:
+        f"""Generate a workout plan for {name} with the following parameters:
         Fitness Goals: {Fitness_Goals}
         Experience Level: {Experience_Level}
         Available Equipment: {Available_Equipment}
         Time Commitment: {Time_Commitment}
         Timeframe: {Timeframe}
-        Injuries / Limitations: {Injuries_Limitations if Injuries_Limitations else 'None'}"""
+        Injuries / Limitations: {Injuries_Limitations if Injuries_Limitations else 'None'}
+        Please provide a detailed workout plan including exercises, sets, reps, and any other relevant information.
+        with weekly breakdown and also day by day plan for the given timeframe. The plan should be structured in a way that is easy to follow and implement.)
+        """
         )
     except Exception as e:
         print(f"An error occurred: {e}")
         response = None
+
+    st.write(f"""Generated Plan for {name} includig below contect: \n
+        Fitness Goals: {Fitness_Goals} \n
+        Experience Level: {Experience_Level} \n
+        Available Equipment: {Available_Equipment} \n
+        Time Commitment: {Time_Commitment} \n
+        Timeframe: {Timeframe} \n
+        Injuries / Limitations: {Injuries_Limitations} \n
+        """)
     st.write(response.content)
