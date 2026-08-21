@@ -17,7 +17,7 @@ Fitness_Goals = st.selectbox("Fitness Goals", ["Build Muscle", "Lose Fat", "Endu
 Experience_Level = st.selectbox("Experience Level", ["Beginner", "Intermediate", "Advanced"])
 Available_Equipment = st.selectbox("Available Equipment", ["None", "Basic (Dumbbells, Resistance Bands)", "Full Gym"])
 Time_Commitment = st.selectbox("Time Commitment", ["30 minutes/day", "1 hour/day", "2 hours/day"])
-Timeframe = st.selectbox("Timeframe", ["1 day ", "2 days", "3 days", "4 days", "5 days", "6 days", "7 days"])
+Timeframe = st.text_input("Enter your timeframe (e.g., 1 Days, 3 months, 6 months):")
 Injuries_Limitations = st.text_input("Injuries / Limitations: Optional*")
 
 #assigning the groq api key from the environment variable
@@ -27,17 +27,27 @@ if not groq_api_key:
     st.error("GROQ_API_KEY is not set. Please set it in your environment variables.")
 
 #Initializing the Groq client and ChatGroq model
-groq_chat = ChatGroq(api_key=groq_api_key, model="openai/gpt-oss-120b", temperature=0.7, max_tokens=500)
+try:
+    groq_chat = ChatGroq(api_key=groq_api_key, model="openai/gpt-oss-120b", temperature=0.7, max_tokens=500)
+except Exception as e:
+    st.error(f"Error initializing Groq client: {e}")
 
 #Generating the plan when the button is clicked
 if st.button("Generate Plan"):
-    response = groq_chat.invoke(
-    f"""Generating a plan for {name} with the following parameters:
-    Fitness Goals: {Fitness_Goals}
-    Experience Level: {Experience_Level}
-    Available Equipment: {Available_Equipment}
-    Time Commitment: {Time_Commitment}
-    Timeframe: {Timeframe}
-    Injuries / Limitations: {Injuries_Limitations if Injuries_Limitations else 'None'}"""
-    )
+    if not Timeframe:
+        st.error("Please enter a valid timeframe.")
+        exit()
+    try:
+        response = groq_chat.invoke(
+        f"""Generating a plan for {name} with the following parameters:
+        Fitness Goals: {Fitness_Goals}
+        Experience Level: {Experience_Level}
+        Available Equipment: {Available_Equipment}
+        Time Commitment: {Time_Commitment}
+        Timeframe: {Timeframe}
+        Injuries / Limitations: {Injuries_Limitations if Injuries_Limitations else 'None'}"""
+        )
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        response = None
     st.write(response.content)
